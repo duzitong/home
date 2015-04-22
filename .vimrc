@@ -56,7 +56,7 @@ set bsdir=buffer
 set autochdir
 
 "tab switch
-map <s-tab> :tabn<CR>
+map <s-tab> :tabn<CR>:e %<cr>
 
 "========================
 "tab maximize
@@ -99,3 +99,4 @@ au BufRead,BufNewFile *.trans set filetype=trans
 " Latex setting
 set grepprg=grep\ -nH\ $*
 let g:tex_flavor='latex'
+
