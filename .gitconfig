@@ -1,0 +1,10 @@
+[user]
+	name = duzitong
+	email = duzitong811@126.com
+[alias]
+    co = checkout
+    ci = commit
+    st = status
+    br = branch
+[push]
+	default = simple
