@@ -157,13 +157,20 @@ function save_tags_config()
     file:write( v[1] .. "," .. v[2] .. "\n")
   end
 
-  -- print current selected tag
+  -- print currently selected tag
   selected = awful.tag.getidx()
   file:write( selected .. "\n")
 
   file.close()
 end
 
+-- move tag
+function move_tag(postr)
+    pos = tonumber(postr) 
+    if pos > 0 then
+        awful.tag.move(pos, nil)
+    end
+end
 tags, selected = load_tags_config()
 
 for s = 1, screen.count() do
@@ -745,12 +752,18 @@ end),
               function ()
                   awful.prompt.run({ prompt = "Create New Tag: " },
                   mypromptbox[mouse.screen].widget,
-                  awful.tag.add, nil, nil, nil, move_to_last) 
+                  awful.tag.add, nil, nil, nil, save_tags_config) 
               end),
     awful.key({ modkey, "Shift" }, "n",
               function ()
                   awful.tag.delete()
                   save_tags_config()
+              end),
+    awful.key({ modkey, "Control" }, "n",
+              function ()
+                  awful.prompt.run({ prompt = "Move Current Tag to: " },
+                  mypromptbox[mouse.screen].widget,
+                  move_tag, nil, nil, nil, save_tags_config) 
               end)
 )
 
