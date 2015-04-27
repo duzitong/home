@@ -19,6 +19,12 @@ local yidoc     = require("yidoc")
 -- }}}
 
 -- {{{ Error handling
+function dbg(e)
+  naughty.notify({ preset = naughty.config.presets.critical,
+  title = "debug",
+  text = e })
+end
+
 if awesome.startup_errors then
     naughty.notify({ preset = naughty.config.presets.critical,
                      title = "Oops, there were errors during startup!",
@@ -92,14 +98,82 @@ local layouts = {
 -- }}}
 
 -- {{{ Tags
-tags = {
-   names = { "Code", "Web", "HW", "Music", },
-   layout = { layouts[2], layouts[1], layouts[2], layouts[1], }
-}
+-- load tags layouts from config file
+function load_tags_config()
+  default_tag_params = {
+    { "tty", 2},
+    { "Code", 2},
+    { "Web", 1},
+    { "File", 1},
+    { "Music", 1}
+  }
+  file = io.open(os.getenv("HOME") .. "/.awesome_tags")
+  if file == nil then 
+    tag_params = default_tag_params
+  else 
+    tag_params = {}
+    while true do
+      line = file:read()
+      if line == nil then break end
+      if string.len(line) == 1 then
+          selected = string.match(line, "(%d)")
+          break
+      end
+      print (line)
+      n,v = string.match(line, "(%w+),(%d)")
+      table.insert(tag_params, {n, 1*v})
+    end
+  end
+
+  names={}
+  layout={}
+  for k,v in pairs(tag_params) do
+    table.insert(names, v[1])
+    table.insert(layout, layouts[v[2]])
+  end
+  return { names = names, layout = layout }, selected
+end
+
+function indexof(t,e)
+  for k,v in pairs(t) do
+    if v == e then return k end
+  end
+  return 1
+end
+
+-- save tags layouts into config file
+function save_tags_config()
+  tag_params = {}
+  file = io.open(os.getenv("HOME") .. "/.awesome_tags", "w")
+  taglist = awful.tag.gettags(1)
+  for k,v in pairs(taglist) do
+    n=v.name
+    l=indexof(layouts, awful.tag.getproperty(v,"layout"))
+    table.insert(tag_params, {n,l})
+  end
+  
+  -- print tags:  <name>, <layout#>
+  for k,v in pairs(tag_params) do
+    file:write( v[1] .. "," .. v[2] .. "\n")
+  end
+
+  -- print current selected tag
+  selected = awful.tag.getidx()
+  file:write( selected .. "\n")
+
+  file.close()
+end
+
+tags, selected = load_tags_config()
 
 for s = 1, screen.count() do
    tags[s] = awful.tag(tags.names, s, tags.layout)
 end
+for s = 1, selected-1 do
+    awful.tag.viewidx(1) 
+end
+
+
 -- }}}
 
 -- {{{ Wallpaper
@@ -120,8 +194,8 @@ myawesomemenu = {
 }
 
 mypowermenu = {
-  { "suspend", "systemctl suspend"},
-  { "hibernate", "systemctl hibernate"},
+  { "suspend", "systemctl suspend" },
+  { "hibernate", "systemctl hibernate" },
   { "reboot", "systemctl reboot" },
   { "shutdown", "systemctl poweroff" },
 }
@@ -230,7 +304,7 @@ function()
         --naughty.destroy(warnNotice)
     else
         if tonumber(remain) < 10 then
-            os.execute("systemctl hibernate")
+            os.execute("systemctl suspend")
         else    
             if tonumber(remain) <20 then 
                 color = "#EA6F81"
@@ -489,7 +563,9 @@ globalkeys = awful.util.table.join(
 
     -- Take a screenshot
     -- https://github.com/copycat-killer/dots/blob/master/bin/screenshot
-    awful.key({ altkey }, "p", function() os.execute("screenshot") end),
+    awful.key({ altkey }, "p", function() 
+            awful.util.spawn_with_shell("scrot ~/pics/screenshots/'%y-%m-%d-%H%M%S'.png",false)
+end),
 
     -- lock (using xscreensaver)
     awful.key({ "Control", altkey }, "l", function () awful.util.spawn("xscreensaver-command -lock") end),
@@ -497,7 +573,7 @@ globalkeys = awful.util.table.join(
     -- Tag browsing
     awful.key({ modkey }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey }, "Right",  awful.tag.viewnext       ),
-    awful.key({ modkey }, "Escape", awful.tag.history.restore),
+    awful.key({ modkey }, "Tab", awful.tag.history.restore),
 
     -- Non-empty tag browsing
     --awful.key({ altkey }, "Left", function () lain.util.tag_view_nonempty(-1) end),
@@ -510,11 +586,21 @@ globalkeys = awful.util.table.join(
             --awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ altkey, "Shift"}, "Tab",
+    awful.key({ altkey }, "Left",
         function ()
-            awful.client.focus.byidx(1)
+            awful.client.focus.byidx( -1)
             if client.focus then client.focus:raise() end
         end),
+    awful.key({ altkey }, "Right",
+        function ()
+            awful.client.focus.byidx( 1)
+            if client.focus then client.focus:raise() end
+        end),
+    -- awful.key({ altkey, "Shift"}, "Tab",
+    --     function ()
+    --         awful.client.focus.byidx(-1)
+    --         if client.focus then client.focus:raise() end
+    --     end),
 
     -- By direction client focus
     awful.key({ modkey }, "j",
@@ -559,13 +645,13 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "Left",  function () awful.client.moveresize(-10,   0,   0,   0) end),
     awful.key({ modkey, "Shift"   }, "Right", function () awful.client.moveresize( 10,   0,   0,   0) end),
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
-    awful.key({ modkey,           }, "Tab",
-        function ()
-            awful.client.focus.history.previous()
-            if client.focus then
-                client.focus:raise()
-            end
-        end),
+    -- awful.key({ modkey,           }, "Tab",
+    --     function ()
+    --         awful.client.focus.history.previous()
+    --         if client.focus then
+    --             client.focus:raise()
+    --         end
+    --     end),
     awful.key({ altkey, "Shift"   }, "l",      function () awful.tag.incmwfact( 0.05)     end),
     awful.key({ altkey, "Shift"   }, "h",      function () awful.tag.incmwfact(-0.05)     end),
     awful.key({ modkey, "Shift"   }, "l",      function () awful.tag.incnmaster(-1)       end),
@@ -578,7 +664,7 @@ globalkeys = awful.util.table.join(
 
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
-    awful.key({ modkey, "Control" }, "r",      awesome.restart),
+    awful.key({ modkey, "Control" }, "r",      function() save_tags_config() awesome.restart() end),
     awful.key({ modkey, "Shift"   }, "q",      awesome.quit),
 
     -- Dropdown terminal
@@ -659,11 +745,12 @@ globalkeys = awful.util.table.join(
               function ()
                   awful.prompt.run({ prompt = "Create New Tag: " },
                   mypromptbox[mouse.screen].widget,
-                  awful.tag.add, nil)
+                  awful.tag.add, nil, nil, nil, move_to_last) 
               end),
     awful.key({ modkey, "Shift" }, "n",
               function ()
                   awful.tag.delete()
+                  save_tags_config()
               end)
 )
 
@@ -723,6 +810,16 @@ for i = 1, 9 do
                       end
                   end))
 end
+-- Bind PrintScreen key to `scrot -s`
+-- date +%y%m%d_%H%M%S
+-- Dependency: scrot
+globalkeys = awful.util.table.join(globalkeys,
+    awful.key( {}, "Print",
+        function()
+            awful.util.spawn_with_shell("scrot ~/pics/screenshots/'%y-%m-%d-%H%M%S'.png",false)
+        end
+    )
+)
 
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
@@ -743,9 +840,6 @@ awful.rules.rules = {
                      keys = clientkeys,
                      buttons = clientbuttons,
 	                   size_hints_honor = false } },
-
-    { rule = { name = "ncmpcpp" },
-          properties = { tag = tags[1][3]} },
 
     { rule = { class = "URxvt" },
           properties = { opacity = 0.95 } },
