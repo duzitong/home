@@ -7,47 +7,47 @@
 ⊞ + #         - No.#
 ⊞ + Left      - Left
 ⊞ + Right     - Right
-⊞ + ESC       - Previous
-Alt + Left    - Left Full
-Alt + Right   - Right Full
-
-== Window Navi ==
-Alt + k       -   Previous
-Alt + j       -   Next
-⊞ + k/j/h/l   -   Vim Jump Window
+⊞ + Tab       - Previous
+⊞ + N         - Create Tag
+⊞ +  ⇧  + N  - Delete Tag
+⊞ + Ctrl + N  - Move Tag
+⊞ + Tab       - Previous Tag
 
 == Window Action ==
 ⊞ + f         - Fullscreen
 ⊞ + q         - Kill
 ⊞ + Ctrl + Sp - Floating
 ⊞ + t         - Pin to Top
-⊞ + n         - Min
+⊞ + d         - Min
 ⊞ + m         - Max
 ⊞ + ⇧ + #     - Send to Tag.#
+Alt + Tab     - Previous Window
+Alt + Left    - Left Window
+Alt + Right   - Right Window
 
 == Layout ==
-⊞ + ⇧ + j     - Swap with Right(seq)
+⊞ + ⇧ + j    - Swap with Right(seq)
 ⊞ + ⇧ + k     - Swap with Left(seq)
 ⊞ + u         - Jump to urgent
-⊞ + Tab       - Alt-Tab
-⊞ + ⇧ + l     - Main Zone Win+1
-⊞ + ⇧ + h - Main Zone Win-1
+⊞ + ⇧ + l    - Main Zone Win+1
+⊞ + ⇧ + h    - Main Zone Win-1
 ⊞ + Ctrl  + l - Main Zone Col+1
 ⊞ + Ctrl  + h - Main Zone Col-1
 ⊞ + Space     - Next Layout
 ⊞ + Ctrl  + n - Restore one Window
 
-== Resize ==
-Alt + ⇧ + l   - Width + 5%
-Alt + ⇧ + h   - Width - 5%
-
 == Volume ==
-Alt + Up        - Vol + 2%
-Alt + Down      - Vol - 2%
-Alt + m         - Mute
-Alt + Ctrl  + m - Vol 100%
+Fn + F12      - Vol + 2%
+Fn + F11      - Vol - 2%
+Fn + F10      - Mute
 
 == Misc ==
+Fn + Up       - Stop
+Fn + Down     - Pause
+Fn + Left     - Previous
+Fn + Right    - Next
+
+== Others ==
 F1            - Quake-like Terminal
 
 ⊞ + c         - Copy to Clip
