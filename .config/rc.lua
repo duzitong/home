@@ -171,6 +171,14 @@ function move_tag(postr)
         awful.tag.move(pos, nil)
     end
 end
+
+-- create tag
+function create_tag(name)
+    t = awful.tag.add(name)
+    awful.tag.viewonly(t)
+end
+
+
 tags, selected = load_tags_config()
 
 for s = 1, screen.count() do
@@ -752,7 +760,7 @@ end),
               function ()
                   awful.prompt.run({ prompt = "Create New Tag: " },
                   mypromptbox[mouse.screen].widget,
-                  awful.tag.add, nil, nil, nil, save_tags_config) 
+                  create_tag, nil, nil, nil, save_tags_config) 
               end),
     awful.key({ modkey, "Shift" }, "n",
               function ()
