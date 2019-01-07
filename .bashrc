@@ -33,25 +33,8 @@ alias n='sudo netctl'
 alias na='sudo netctl-auto'
 alias y='yaourt'
 
-# auto-completion for alias
-_completion_loader systemctl
-_completion_loader netctl
-_completion_loader pacman
-_completion_loader yaourt
-_completion_loader sudo
-complete -F _systemctl -o default sc
-complete -F _pacman -o default pm
-complete -F _netctl -o default n
-complete -F _netctl_auto -o default na
-complete -F _yaourt -o default y
-complete -F _sudo -o default sd
-
 #editor
 export EDITOR="vim"
-
-# local bin folder
-export PATH=$PATH:~/.bin
-export PATH=$PATH:~/.gem/ruby/2.2.0/bin
 
 # including this ensures that new gnome-terminal tabs keep the parent `pwd` !
 if [ -e /etc/profile.d/vte.sh ]; then
