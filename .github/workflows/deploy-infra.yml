@@ -1,0 +1,35 @@
+name: Terraform apply infra change
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  dev:
+    name: dev
+    needs: []
+    uses: ./.github/workflows/list-and-run.yml
+    secrets: inherit
+    with:
+      directory: dev
+
+  qa:
+    name: qa
+    needs: [dev]
+    uses: ./.github/workflows/list-and-run.yml
+    secrets: inherit
+    with:
+      directory: qa
+
+  prod:
+    name: prod
+    needs: [dev,qa]
+    uses: ./.github/workflows/list-and-run.yml
+    secrets: inherit
+    with:
+      directory: prod
